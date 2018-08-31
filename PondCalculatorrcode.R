@@ -67,16 +67,6 @@ runApp(list(
     output$Uploadinput <-renderTable({mydata()})
 
 
-    # Temporary Creates Table view of Uploaded File
-    output$contents <- renderTable({
-      inFile <- input$excelupload
-
-      if(is.null(inFile))
-      return(NULL)
-      file.rename(inFile$datapath,
-        paste(inFile$datapath, ".xlsx", sep=""))
-      read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
-      })
   }
   ))
 
