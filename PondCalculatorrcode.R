@@ -18,12 +18,11 @@ runApp(list(
       numericInput("PondSurface", "Add New Area",NULL),
       actionButton("update", "Update Table"),
       
-      ## Islands need to be added in the spreadsheet later now
+      ## Islands need to be added in the spreadsheet later
       # h3("Step 3:"),
       # numericInput("text1", "Add Island Depth",NULL),
       # numericInput("text2", "Add IslandArea",NULL),
       # actionButton("update", "Update Table"),
-      
       
       h3("Step 4:"),
       actionButton("calculate", "Calculate Pond Volume")
@@ -78,7 +77,20 @@ runApp(list(
     # Converts Reactive Values to Table View
     output$ManualInput <- renderTable({values$df})
     
-    
+
+    newEntry <- observe({
+      if(input$calculate> 0) {
+        ##Sort Data Table by Water Depth. Drops Null rows, orders by size
+        WaterVol <- na.omit(select(values$df, Depth, Area)[order(values$df$Depth, decreasing= FALSE),])
+        WaterVol$AvgDepth <-runmean(WaterVol$Depth,2)
+        WaterVol$AvgArea <- runmean(WaterVol$Area,2)
+        WaterVol$Vol <- WaterVol$AvgDepth * WaterVol$AvgArea
+        
+        message("Pond Volume Is: " ,(sum(WaterVol$Vol)/43560), " Acre-Feet")
+        Result <- sum(WaterVol$Vol)/43560
+        
+          }
+    })
     
     
     
