@@ -4,69 +4,83 @@ library(readxl)
 runApp(list(
   ui=fluidPage(
     titlePanel("Pond Calculator"
-      ),
-
+    ),
+    
     sidebarPanel(
-      h3("Step 1:"),
-      fileInput('excelupload','Upload Existing Pond Table',
-        accept = c(".xlsx")),
-      
+      h3("Step 1: (Optional)"),
+      fileInput('excelupload','Select Existing Pond Table',
+                accept = c(".xlsx")),
+      # ANDY: How do we get rid of this so that it automatically uploads?
+      actionButton("updatetest", "Confirm"),
       
       h3("Step 2:"),
       numericInput("PondDepth", "Add New Depth",NULL),
       numericInput("PondSurface", "Add New Area",NULL),
       actionButton("update", "Update Table"),
-
+      
       ## Islands need to be added in the spreadsheet later now
       # h3("Step 3:"),
       # numericInput("text1", "Add Island Depth",NULL),
       # numericInput("text2", "Add IslandArea",NULL),
       # actionButton("update", "Update Table"),
       
-
+      
       h3("Step 4:"),
       actionButton("calculate", "Calculate Pond Volume")
       
-      ),
-
+    ),
+    
     mainPanel(
       tableOutput("ManualInput"), 
       tableOutput("Uploadinput"), # Temporary
       downloadButton("save", "Download")
-      )
-    ),
-
-
-
+    )
+  ),
+  
+  
+  
   server=function(input, output, session) { 
-
-    # Create Reactive values to manually add data    
+    
+    # Create empty reactive values to receive manually added data    
     values <- reactiveValues()
     values$df <- data.frame(Depth = NA, Area = NA)
+    
+    
+    # Upload XLSX into R Shiny App
+    mydata <- reactive({
+      inFile <- input$excelupload
+      
+      if(is.null(inFile))
+        return(NULL)
+      file.rename(inFile$datapath,
+                  paste(inFile$datapath, ".xlsx", sep=""))
+      read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
+    })
+    
+    
+    # Creates Trigger to assign uploaded xlsx to dataframe
+    newEntry2 <- observe({
+      if(input$updatetest > 0) {
+        
+        isolate(values$df<-rbind(values$df, mydata()))
+      }
+    })
+    
+    
+    # Creates Trigger to append manually declared data to reactive table
     newEntry <- observe({
       if(input$update > 0) {
         newLine <- isolate(c(input$PondDepth, input$PondSurface))
         isolate(values$df <- rbind(values$df, newLine))
       }
-      })
-      # Converts Reactive Values to Table View
-      output$ManualInput <- renderTable({values$df})
-      
-
-    # Upload XLSX into reactive file
-    mydata <- reactive({
-      inFile <- input$excelupload
-
-      if(is.null(inFile))
-      return(NULL)
-      file.rename(inFile$datapath,
-        paste(inFile$datapath, ".xlsx", sep=""))
-      read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
-      })
-    ## Generate table from reactive upload
-    output$Uploadinput <-renderTable({mydata()})
-
-
+    })
+    
+    # Converts Reactive Values to Table View
+    output$ManualInput <- renderTable({values$df})
+    
+    
+    
+    
+    
   }
-  ))
-
+))
