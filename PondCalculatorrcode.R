@@ -1,5 +1,8 @@
 library(shiny)
 library(readxl)
+library(caTools)
+library(dplyr)
+
 
 runApp(list(
   ui=fluidPage(
@@ -30,9 +33,9 @@ runApp(list(
     ),
     
     mainPanel(
-      tableOutput("ManualInput"), 
-      tableOutput("Uploadinput"), # Temporary
+      tableOutput("ManualInput"),
       downloadButton("save", "Download")
+      
     )
   ),
   
