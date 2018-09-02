@@ -14,8 +14,7 @@ runApp(list(
     sidebarPanel(
       h3("Step 1", align="center"),
       
-      fileInput('excelupload','Use Existing Pond Table',
-                accept = c(".xlsx")),
+      fileInput('excelupload', 'Use Existing Pond Table', accept = c(".xlsx")),
       
       h3("or",align="center"),
       numericInput("PondDepth", "Pond Depth (Feet)",NULL),
@@ -42,9 +41,8 @@ runApp(list(
     
     mainPanel(
       p("Pond Table"),
-      DT::dataTableOutput('PondMeasurement')
-      
-      
+      DT::dataTableOutput('PondMeasurement'),
+      textOutput("selected_var")
     )
   ),
   
@@ -55,7 +53,7 @@ runApp(list(
     # Create empty reactive values to receive manually added data    
     values <- reactiveValues()
     values$df <- data.frame(Depth = NULL, Area = NULL)
-    
+    Result<-0.0
     
     # Upload XLSX into R Shiny App
     mydata <- reactive({
@@ -67,7 +65,7 @@ runApp(list(
                   paste(inFile$datapath, ".xlsx", sep=""))
       read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
     })
-
+    
     # Creates Trigger to assign uploaded xlsx to dataframe
     newEntry4 <- observe({
       if(is.null(input$excelupload) == FALSE) {
@@ -84,7 +82,6 @@ runApp(list(
         values$df <- values$df[-as.numeric(input$table1_rows_selected),]
       }
     })
-    
     
     
     # Creates Trigger to append manually declared data to reactive table
@@ -107,8 +104,8 @@ runApp(list(
                       dom = 'Bfrtip',
                       buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
                       
-                      )
                     )
+      )
     )
     
     
@@ -120,11 +117,13 @@ runApp(list(
         WaterVol$AvgArea <- runmean(WaterVol$Area,2)
         WaterVol$Vol <- WaterVol$AvgDepth * WaterVol$AvgArea
         
-        message("Pond Volume Is: " ,(sum(WaterVol$Vol)/43560), " Acre-Feet")
-        Result <- sum(WaterVol$Vol)/43560
+        output$selected_var <- renderText({ paste("Your pond has a volume of",(sum(WaterVol$Vol)/43560), " Acre-Feet")
+        })
         
-          }
+      }
     })
+    
+    
     
     
     
