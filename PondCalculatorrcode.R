@@ -2,6 +2,8 @@ library(shiny)
 library(readxl)
 library(caTools)
 library(dplyr)
+library(DT)
+
 
 
 runApp(list(
@@ -10,31 +12,38 @@ runApp(list(
     ),
     
     sidebarPanel(
-      h3("Step 1: (Optional)"),
-      fileInput('excelupload','Select Existing Pond Table',
-                accept = c(".xlsx")),
-      # ANDY: How do we get rid of this so that it automatically uploads?
-      actionButton("updatetest", "Confirm"),
+      h3("Step 1", align="center"),
       
-      h3("Step 2:"),
-      numericInput("PondDepth", "Add New Depth",NULL),
-      numericInput("PondSurface", "Add New Area",NULL),
-      actionButton("update", "Update Table"),
+      fileInput('excelupload','Use Existing Pond Table',
+                accept = c(".xlsx")),
+      
+      h3("or",align="center"),
+      numericInput("PondDepth", "Pond Depth (Feet)",NULL),
+      numericInput("PondSurface", "Pond Surface Area (Square-Feet)",NULL),
+      actionButton("update", "Add new Entry"),
       
       ## Islands need to be added in the spreadsheet later
-      # h3("Step 3:"),
+      h3("Step 2", align="center"),
+      p("Under Development: Add Islands"),
       # numericInput("text1", "Add Island Depth",NULL),
       # numericInput("text2", "Add IslandArea",NULL),
       # actionButton("update", "Update Table"),
       
-      h3("Step 4:"),
+      h3("Step 3", align="center"),
+      p("Select incorrect rows from the table on the right and click on the button below"),
+      actionButton("deleteRows", "Remove Selected Rows"),
+      
+      h3("Step 4", align = "center"),
       actionButton("calculate", "Calculate Pond Volume")
+      # Maybe add this visualization: https://shiny.rstudio.com/gallery/plot-interaction-exclude.html
+      # Need to talk to range guys to see what they want. lm plot may be overkill
       
     ),
     
     mainPanel(
-      tableOutput("ManualInput"),
-      downloadButton("save", "Download")
+      p("Pond Table"),
+      DT::dataTableOutput('PondMeasurement')
+      
       
     )
   ),
@@ -45,7 +54,7 @@ runApp(list(
     
     # Create empty reactive values to receive manually added data    
     values <- reactiveValues()
-    values$df <- data.frame(Depth = NA, Area = NA)
+    values$df <- data.frame(Depth = NULL, Area = NULL)
     
     
     # Upload XLSX into R Shiny App
@@ -58,15 +67,24 @@ runApp(list(
                   paste(inFile$datapath, ".xlsx", sep=""))
       read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
     })
-    
-    
+
     # Creates Trigger to assign uploaded xlsx to dataframe
-    newEntry2 <- observe({
-      if(input$updatetest > 0) {
-        
+    newEntry4 <- observe({
+      if(is.null(input$excelupload) == FALSE) {
         isolate(values$df<-rbind(values$df, mydata()))
       }
     })
+    
+    
+    
+    observeEvent(input$deleteRows,{
+      
+      if (!is.null(input$table1_rows_selected)) {
+        
+        values$df <- values$df[-as.numeric(input$table1_rows_selected),]
+      }
+    })
+    
     
     
     # Creates Trigger to append manually declared data to reactive table
@@ -78,9 +96,22 @@ runApp(list(
     })
     
     # Converts Reactive Values to Table View
-    output$ManualInput <- renderTable({values$df})
+    output$PondMeasurement <- DT::renderDataTable(
+      DT::datatable(values$df, 
+                    rownames = FALSE, 
+                    extensions = 'Buttons',
+                    
+                    options = list(
+                      paging = FALSE, 
+                      searching = FALSE,
+                      dom = 'Bfrtip',
+                      buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+                      
+                      )
+                    )
+    )
     
-
+    
     newEntry <- observe({
       if(input$calculate> 0) {
         ##Sort Data Table by Water Depth. Drops Null rows, orders by size
