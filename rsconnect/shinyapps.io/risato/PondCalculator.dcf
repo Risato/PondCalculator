@@ -5,8 +5,9 @@ account: risato
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 417384
-bundleId: 1566305
+bundleId: 1566338
 url: https://risato.shinyapps.io/PondCalculator/
-when: 1535935969.33996
+when: 1535937659.70363
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: .gitattributes|.RData|PondCalc.xlsx|PondCalcAdvanced.xlsx|PondCalcManual.R|PondCalCompleted.xlsx

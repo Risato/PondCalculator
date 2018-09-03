@@ -1,0 +1,12 @@
+name: PondCalc
+title: PondCalc
+username:
+account: risato
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 417405
+bundleId: 1566346
+url: https://risato.shinyapps.io/PondCalc/
+when: 1535938057.06031
+asMultiple: FALSE
+asStatic: FALSE
