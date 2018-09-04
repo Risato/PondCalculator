@@ -76,13 +76,23 @@ shinyServer(function(input, output, session) {
     if(input$calculate> 0) {
       ##Sort Data Table by Water Depth. Drops Null rows, orders by size
       WaterVol <- na.omit(select(values$df, Depth, Area)[order(values$df$Depth, decreasing= FALSE),])
-      WaterVol$AvgDepth <-runmean(WaterVol$Depth,2)
-      WaterVol$AvgArea <- runmean(WaterVol$Area,2)
-      WaterVol$Vol <- WaterVol$AvgDepth * WaterVol$AvgArea
+      WaterVol$RelDepth <- c(0, diff(WaterVol$Depth))# Calculates Relative depth
+      WaterVol$AvgArea <- runmean(WaterVol$Area,2) # Calculates Average of surface areas
+      WaterVol$Vol <- WaterVol$RelDepth * WaterVol$AvgArea
       
       output$selected_var <- renderText({ paste("Your pond has a volume of",(sum(WaterVol$Vol)/43560), " Acre-Feet")
       })
       
     }
   })
+  
+  output$PondDiagram <-renderPlot({
+    ggplot(values$df, aes(x=Depth, y=Area, fill=Area)) +
+      geom_bar(stat="identity") +
+      theme_minimal() +
+      coord_flip() +
+      theme(legend.position="none") +
+      labs(x="Pond Depth (ft)", y = "Surface Area (ft^2)")
+    })
+  
 })

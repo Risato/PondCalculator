@@ -14,42 +14,54 @@ library(caTools)
 # library(DT, warn.conflicts = FALSE)
 library(dplyr)
 library(DT)
+library(ggplot2)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
     titlePanel("Pond Calculator"),
     
-    p("This is a Pond Calculator developed to assist with stocking pond volumes. Enter your depths and associated surface area into the calculator below to generate a pond curve for your property. To save your data, download your table as a csv or xlsx file after you have generated the table."),
+    p("Use this Pond Calculator to assist with measurement of your stock pond volumes. Enter your depths and associated surface area with the provided template or using the text boxes below. To save your data, download your table as a csv or xlsx file after you have generated the table."),
     
     sidebarPanel(
-      h3("Step 1", align="Left"),
-      fileInput('excelupload', 'Upload Existing Pond Table', accept = c(".xlsx")),
+      h4('Step 1: Upload Existing Pond Table'),
+      fileInput('excelupload', NULL, accept = c(".xlsx")),
       
-      h3("Step 2", align="Left"),
-      numericInput("PondDepth", "Pond Depth (Feet)",NULL),
-      numericInput("PondSurface", "Pond Surface Area (Square-Feet)",NULL),
-      actionButton("update", "Add new Entry"),
+      helpText("(Optional) Pond Depth (Feet)", align="Left"),
+      numericInput("PondDepth", NULL,NULL),
+      helpText("(Optional) Pond Surface Area (Square-Feet)", align="Left"),
+      numericInput("PondSurface", NULL,NULL),
+      actionButton("update", "Add New Entry"),
       
       ## Islands need to be added in the spreadsheet later
-      h3("Step 3", align="Left"),
-      p("Under Development: Add Islands"),
-      # numericInput("text1", "Add Island Depth",NULL),
+      hr(),
+      h4('Step 2: Add Island Depth'),
+      helpText("Under Development", align="Left"),
+      numericInput("text1", NULL, NULL),
       # numericInput("text2", "Add IslandArea",NULL),
       # actionButton("update", "Update Table"),
-      
-      h3("Step 4", align="Left"),
-      p("Under Development Select incorrect rows from the table on the right and click on the button below"),
-      actionButton("deleteRows", "Remove Selected Rows"),
-      
-      h3("Step 5", align = "Left"),
-      actionButton("calculate", "Calculate Pond Volume")
+      hr(),
+      h4("Step 3: Calculate Pond Volume", align = "Left"),
+      actionButton("calculate", "Calculate")
       
       # Maybe add this visualization: https://shiny.rstudio.com/gallery/plot-interaction-exclude.html
       # Need to talk to range guys to see what they want. lm plot may be overkill
     ),
     mainPanel(
-      DT::dataTableOutput('PondMeasurement'),
-      span(textOutput("selected_var"), style="color:red")
+        fluidRow(
+          column(width = 6,
+                 #h4("Pond Table", align = "center"),
+                 span(textOutput("selected_var"), style="color:red"),
+                 DT::dataTableOutput('PondMeasurement')
+                 
+          ),
+          column(width = 6,
+                 #h4("Bar plot", align = "Center"),
+                 plotOutput("PondDiagram")
+                 )
+        ),
+        helpText("If there is incorrect data, remove the rows before calculating."),
+        helpText("CLICK ONCE on each row containing incorrect information, then click on the 'Remove Selected Rows' button below."),
+        actionButton("deleteRows", "Remove Selected Rows")
     )
   )
 )
