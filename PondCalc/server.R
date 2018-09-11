@@ -1,98 +1,118 @@
-#
-# This is the server logic of a Shiny web application. You can run the 
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
 library(shiny)
 library(readxl)
 library(caTools)
-# library(dplyr, warn.conflicts = FALSE)
-# library(DT, warn.conflicts = FALSE)
 library(dplyr)
 library(DT)
 
-# Define server logic required to draw a histogram
+## Create a reactive values object that will store the data frame     
+## This object will be updated by three types of events
+##   1) An Excel sheet uploaded
+##   2) A new row added with the 'Add Row' button
+##   3) A row deleted with the 'Delete Selected Row(s)' button
+pond_data <- reactiveValues()
+
+## Dont need to initialize actually
+##pond_data$df <- data.frame(depth=NA, area=NA)[-1,]
+
+## Utility function to add relative depth and volume to a data frame
+add_vol <- function(depth_area_df, addzero=TRUE) {
+  ## Convert column names to lowercase
+  names(depth_area_df) <- tolower(names(depth_area_df))
+  
+  ## Checks needed
+  ##  - flag or automatically delete duplicate rows
+  ##  - make sure there is a 0,0 row
+  ##  - make sure that order(depth) and order(area) are the same
+  depth_area_plus <- depth_area_df %>% na.omit() %>% dplyr::select(depth, area) %>% dplyr::arrange(depth)
+  
+  ## Add the first 0-0 if needed
+  if (addzero) {
+    if (sum(depth_area_plus[1,]) != 0) {
+      depth_area_plus <- rbind(data.frame(depth=0, area=0), depth_area_plus)
+    }
+  }
+
+  ## Add and return the data frame with the calculated columns 
+  depth_area_plus %>% dplyr::mutate(reldepth=c(0, diff(depth)), avgarea=runmean(area,2), vol=reldepth*avgarea)
+}
+
 shinyServer(function(input, output, session) { 
   
-  # Create empty reactive values to receive manually added data    
-  values <- reactiveValues()
-  values$df <- data.frame(Depth = NA, Area = NA)
-  Result<-0.0
+  # Create an observe event connected to the ExcelUpload control
+  # Import the selected spreadsheet and replace the contents of 
+  # pond_data$df with the contents
+  # CHECK WITH RICKY - THE PREVIOUS VERSION APPENDED THE NEW EXCEL DATA,
+  # HERE WE ARE OVERWRITING IT
   
-  # Upload XLSX into R Shiny App
-  mydata <- reactive({
-    inFile <- input$excelupload
-    
-    if(is.null(inFile))
-      return(NULL)
-    file.rename(inFile$datapath,
-                paste(inFile$datapath, ".xlsx", sep=""))
-    read_excel(paste(inFile$datapath, ".xlsx", sep=""), 1)
+  observe({
+    req(input$ExcelUpload)
+    excel_df <- read_excel(input$ExcelUpload$datapath, 1)
+    pond_data$df <- add_vol(excel_df)
+  })
+
+  ## Create an observe event that will update the total volume when the calc_total_vol 
+  ## button is clicked
+  observeEvent(input$calc_total_vol, {
+    output$txt_total_vol <- renderText({ paste("Your pond has a volume of",
+                                               (sum(pond_data$df$vol)/43560), 
+                                               " Acre-Feet")})
   })
   
-  # Creates Trigger to assign uploaded xlsx to dataframe
-  newEntry4 <- observe({
-    if(is.null(input$excelupload) == FALSE) {
-      isolate(values$df<-rbind(values$df, mydata()))
+  ## Create an observeEvent function linked to the addrow action button 
+  ## that will update the data frame when a row is manually entered
+  observeEvent(input$AddRow, {
+    ## Make sure there are values for PondDepth and PondSurface
+    req(input$PondDepth, input$PondSurface)
+    
+    ## Create data frame with the new depth and area
+    new_depth_area_df <- data.frame(depth=input$PondDepth, area=input$PondSurface)
+    
+    if (is.null(pond_data$df)) {
+      pond_data$df <- add_vol(new_depth_area_df)  
+    } else {
+      pond_data$df <- add_vol(pond_data$df %>% select(depth, area) %>% bind_rows(new_depth_area_df))
     }
   })
-  
-  
-  
-  observeEvent(input$deleteRows,{
-    
+
+  ## Create an observeEvent function linked to the deleteRows action button 
+  ## that will update the data frame when a row is manually entered
+  observeEvent(input$DeleteRows,{
     if (!is.null(input$PondMeasurement_rows_selected)) {
-      
-      values$df <- values$df[-as.numeric(input$PondMeasurement_rows_selected),]
+      pond_data$df <- pond_data$df[-as.numeric(input$PondMeasurement_rows_selected),]
     }
   })
   
-  
-  # Creates Trigger to append manually declared data to reactive table
-  newEntry <- observe({
-    if(input$update > 0) {
-      newLine <- isolate(c(input$PondDepth, input$PondSurface))
-      isolate(values$df <- rbind(values$df, newLine))
-    }
+  #output$tbl_populated <- eventReactive(pond_data$df, {
+  #  !is.null(pond_data$df)
+  #})
+  output$tbl_populated <- reactive({
+    !is.null(pond_data$df)
   })
+  outputOptions(output, "tbl_populated", suspendWhenHidden = FALSE)  
   
-  # Converts Reactive Values to Table View
-  output$PondMeasurement <- DT::renderDataTable(
-    DT::datatable(values$df, 
+  ## Render the data table
+  output$PondMeasurement <- DT::renderDataTable({
+    req(pond_data$df)
+    DT::datatable(pond_data$df %>% dplyr::select(depth, area), 
                   rownames = FALSE, 
                   extensions = 'Buttons', 
                   options = list(
                     paging = FALSE, 
                     searching = FALSE,
                     dom = 'Bfrtip',
-                    buttons = list('copy', 'csv', 'excel', 'pdf', 'print'))
-    ))
-  
-  
-  newEntry <- observe({
-    if(input$calculate> 0) {
-      ##Sort Data Table by Water Depth. Drops Null rows, orders by size
-      WaterVol <- na.omit(select(values$df, Depth, Area)[order(values$df$Depth, decreasing= FALSE),])
-      WaterVol$RelDepth <- c(0, diff(WaterVol$Depth))# Calculates Relative depth
-      WaterVol$AvgArea <- runmean(WaterVol$Area,2) # Calculates Average of surface areas
-      WaterVol$Vol <- WaterVol$RelDepth * WaterVol$AvgArea
-      
-      output$selected_var <- renderText({ paste("Your pond has a volume of",(sum(WaterVol$Vol)/43560), " Acre-Feet")
-      })
-      
-    }
+                    buttons = list('copy', 'csv', 'excel', 'pdf', 'print')))
   })
   
+  ## Render the plot
   output$PondDiagram <-renderPlot({
-    ggplot(values$df, aes(x=Depth, y=Area, fill=Area)) +
+    req(pond_data$df)
+    ggplot(pond_data$df, aes(x=depth, y=area, fill=area)) +
       geom_bar(stat="identity") +
       theme_minimal() +
       coord_flip() +
       theme(legend.position="none") +
       labs(x="Pond Depth (ft)", y = "Surface Area (ft^2)")
-    })
+  })
   
 })
+

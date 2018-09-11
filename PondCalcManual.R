@@ -8,7 +8,7 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 
 # Simple Calculation
-## Read in Data
+## Read in Data - creates a tibble
 simpleinput = read_excel("PondCalc.xlsx" )#, "Sheet1", col_types = numeric)
 print(simpleinput)
 
@@ -20,6 +20,13 @@ WaterVol$Vol <- WaterVol$RelDepth * WaterVol$AvgArea
 
 WaterVol
 message("Pond Volume Is: " ,(sum(WaterVol$Vol)/43560), " Acre-Feet")
+
+## Utility function to add relative depth to a data frame
+add_vol <- function(depth_area_df) {
+  ## Convert column names to lowercase
+  names(depth_area_df) <- tolower(names(depth_area_df))
+  pond_data <- depth_area_df %>% na.omit() %>% dplyr::select(depth, area) %>% dplyr::arrange(depth) %>% dplyr::mutate(reldepth=c(0, diff(depth)), avgarea=runmean(area,2), vol=reldepth*avgarea)
+}
 
 
      
