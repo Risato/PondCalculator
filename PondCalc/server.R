@@ -41,12 +41,10 @@ shinyServer(function(input, output, session) {
   # Create an observe event connected to the ExcelUpload control
   # Import the selected spreadsheet and replace the contents of 
   # pond_data$df with the contents
-  # CHECK WITH RICKY - THE PREVIOUS VERSION APPENDED THE NEW EXCEL DATA,
-  # HERE WE ARE OVERWRITING IT
   
   observe({
-    req(input$ExcelUpload)
-    excel_df <- read_excel(input$ExcelUpload$datapath, 1)
+    req(input$FileUpload)
+    excel_df <- read_excel(input$FileUpload$datapath, 1)
     pond_data$df <- add_vol(excel_df)
   })
 
@@ -100,8 +98,11 @@ shinyServer(function(input, output, session) {
                     paging = FALSE, 
                     searching = FALSE,
                     dom = 'Bfrtip',
-                    buttons = list('copy', 'csv', 'excel', 'pdf', 'print')))
-  })
+                    buttons = list(list(extend='copy'),
+                                   list(extend='csv'),
+                                   list(extend='excel',title=NULL, filename = 'Pond Volume Calculator'),
+                                   list(extend='print')))
+    )})
   
   ## Render the plot
   output$PondDiagram <-renderPlot({
