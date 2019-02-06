@@ -9,7 +9,7 @@ shinyUI(fluidPage(
     titlePanel("Pond Volume Calculator"),
     
     p("Use this calculator to measure your stock pond volumes.
-      Enter your pond depth and surface area at various levels throughout the year. You may fill out the provided template or manually enter values in the text boxes below.", a(href = '/PondCalculatorTemplate.xlsx', 'Download Blank Template')),
+      Enter your pond depth and surface area at various levels throughout the year. You may fill out the provided template or manually enter values in the text boxes below.", a(href = '/PondCalc/PondCalculatorTemplate.xlsx', 'Download Blank Template')),
     p("Click on the 'Calculate' button to show the total Acre-Feet of your pond.
       (Optional) To save your entered values, click on the csv or xlsx file after you have calculated your pond values."),
     
