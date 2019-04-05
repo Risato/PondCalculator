@@ -15,27 +15,31 @@ shinyUI(fluidPage(
     
     
     sidebarPanel(
-      h4('Step 1: Upload Existing Pond Table'),
-      fileInput('FileUpload', NULL, accept = c(".xlsx")), # csv input options should be added later
-      
-      helpText("(Optional) Pond Depth (Feet)", align="Left"),
-      numericInput("PondDepth", NULL,NULL),
-      helpText("(Optional) Pond Surface Area (Square-Feet)", align="Left"),
-      numericInput("PondSurface", NULL,NULL),
+      h4('Step 1: Enter Raw Pond Data'),
+      fileInput('FileUpload', "Upload completed table", accept = c(".xlsx")), # csv input options should be added later
+      helpText("or add manually below:", align = "Center"),
+      numericInput("PondDepth", "Depth (Feet):",NULL),
+      numericInput("PondSurface", "Surface Area (Feet^2)",NULL),
       actionButton("AddRow", "Add Row"),
       
       # Islands need to be added in the spreadsheet later
-      hr(),
-      h4('Step 2: Add Island Depth'),
-      helpText("Under Development", align="Left"),
-      numericInput("text1", NULL, NULL),
-       numericInput("text2", "Add IslandArea",NULL),
-       actionButton("update", "Update Table"),
-      hr(),
+#      hr(),
+#      h4('Step 2: Add Island Depth'),
+#      helpText("Under Development", align="Left"),
+#      numericInput("text1", NULL, NULL),
+#      numericInput("text2", "Add IslandArea",NULL),
+#      actionButton("update", "Update Table"),
+#      hr(),
       
-      h4("Step 3: Calculate Pond Volume", align = "Left"),
-      actionButton("calc_total_vol", "Calculate"),
-      span(textOutput("txt_total_vol"), style="color:red")
+
+      span(textOutput("txt_total_vol"), style="color:red"),
+      
+      h4("Step 3: Current Pond Volume", align = "Left"),
+      helpText("Enter current pond depth (Feet)", align="Left"),
+      numericInput("CurrentDepth", NULL,NULL),
+      actionButton("calc_current_vol", "Calculate"),
+      span(textOutput("txt_current_vol"), style="color:red")
+
       
       # Maybe add this visualization: https://shiny.rstudio.com/gallery/plot-interaction-exclude.html
       # Need to talk to range guys to see what they want. lm plot may be overkill

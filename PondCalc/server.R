@@ -3,6 +3,8 @@ library(readxl)
 library(caTools)
 library(dplyr)
 library(DT)
+library(polynom)
+library(ggplot2)
 
 ## Create a reactive values object that will store the data frame     
 ## This object will be updated by three types of events
@@ -33,7 +35,7 @@ add_vol <- function(depth_area_df, addzero=TRUE) {
   }
 
   ## Add and return the data frame with the calculated columns 
-  depth_area_plus %>% dplyr::mutate(reldepth=c(0, diff(depth)), avgarea=runmean(area,2), vol=reldepth*avgarea)
+  depth_area_plus %>% dplyr::mutate(reldepth=c(0, diff(depth)), avgarea=runmean(area,2), vol=reldepth*avgarea, totVol=cumsum(vol)/43560)
 }
 
 shinyServer(function(input, output, session) { 
@@ -50,10 +52,21 @@ shinyServer(function(input, output, session) {
 
   ## Create an observe event that will update the total volume when the calc_total_vol 
   ## button is clicked
-  observeEvent(input$calc_total_vol, {
-    output$txt_total_vol <- renderText({ paste("Your pond has a volume of",
+output$txt_total_vol <- renderText({ paste("Your pond has a volume of",
                                                (sum(pond_data$df$vol)/43560), 
                                                " Acre-Feet")})
+  
+  ## Create an observe event that will update the current pond volume when the calc_current_vol 
+  ## button is clicked
+  observeEvent(input$calc_current_vol, {
+    ## Calculate fit based on input current volume
+    req(input$CurrentDepth)
+    fit<- lm(totVol ~ poly(depth,3,raw = TRUE), data = pond_data$df)
+    qwe<-as.numeric(predict (fit,data.frame(depth = input$CurrentDepth)))
+    
+    output$txt_current_vol <- renderText({ paste("Your pond has a volume of",
+                                                 (as.numeric(qwe)), 
+                                                 " Acre-Feet")})
   })
   
   ## Create an observeEvent function linked to the addrow action button 
@@ -107,13 +120,17 @@ shinyServer(function(input, output, session) {
   ## Render the plot
   output$PondDiagram <-renderPlot({
     req(pond_data$df)
-    ggplot(pond_data$df, aes(x=depth, y=area, fill=area)) +
-      geom_bar(stat="identity") +
+    df <- data.frame("y"=pond_data$df$totVol, "x"=pond_data$df$depth)
+    my.formula <- y ~ poly(x, 3, raw = TRUE)
+    ggplot(df, aes(x, y)) +
+      geom_point(alpha=2/10, shape=21, fill="blue", colour="black", size=5) +
+      geom_smooth(method = "lm", se = FALSE, 
+                  formula = my.formula, 
+                  colour = "red") +
       theme_minimal() +
       coord_flip() +
       theme(legend.position="none") +
-      labs(x="Pond Depth (ft)", y = "Surface Area (ft^2)")
+      labs(x="Pond Depth (ft)", y = "Volume at Depth (Acre-ft)", title = "Pond Curve")
   })
   
 })
-
