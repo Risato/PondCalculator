@@ -13,13 +13,20 @@ shinyUI(fluidPage(
     p("Click on the 'Calculate' button to show the total Acre-Feet of your pond.
       (Optional) To save your entered values, click on the csv or xlsx file after you have calculated your pond values."),
     
-    
+
     sidebarPanel(
       h4('Step 1: Enter Raw Pond Data'),
       fileInput('FileUpload', "Upload completed table", accept = c(".xlsx")), # csv input options should be added later
       helpText("or add manually below:", align = "Center"),
-      numericInput("PondDepth", "Depth (Feet):",NULL),
-      numericInput("PondSurface", "Surface Area (Feet^2)",NULL),
+      #numericInput("PondDepth", "Depth (Feet):",NULL),
+      #numericInput("PondSurface", "Surface Area (Feet^2)",NULL),
+      splitLayout(
+        numericInput(inputId="PondDepth", label="Depth(Feet)", value = NULL),
+        #radioButtons(inputId="DepthUnit", label="", choices = list("Feet" = 1), selected = 1),
+        numericInput(inputId="PondSurface", label="Surface Area", value = NULL),
+        radioButtons(inputId="UnitType", label="", choices = list("Acres" = 'ac', "Square Feet" = 'sqft'), selected = 'sqft')
+        ),
+      #selectInput("select", h3("Select Unit"), choices = list("Acres" = 1, "Square Feet" = 2), selected = 1),
       actionButton("AddRow", "Add Row"),
       
       # Islands need to be added in the spreadsheet later
@@ -32,7 +39,7 @@ shinyUI(fluidPage(
 #      hr(),
       
 
-      span(textOutput("txt_total_vol"), style="color:red"),
+      #span(textOutput("txt_total_vol"), style="color:red"),
       
       h4("Step 3: Current Pond Volume", align = "Left"),
       helpText("Enter current pond depth (Feet)", align="Left"),
@@ -44,25 +51,27 @@ shinyUI(fluidPage(
       # Maybe add this visualization: https://shiny.rstudio.com/gallery/plot-interaction-exclude.html
       # Need to talk to range guys to see what they want. lm plot may be overkill
     ),
-    mainPanel(
-        fluidRow(
-          column(width = 6,
-                 #h4("Pond Table", align = "center"),
-                 DT::dataTableOutput('PondMeasurement'),
-                 
-                 conditionalPanel(
-                   condition = "output.tbl_populated",
-                   div(p("If there is incorrect data, remove the rows before calculating. Click", em("once"), "on each row containing incorrect information, then click on the 'Remove Selected Rows' button below."),
-                       actionButton("DeleteRows", "Remove Selected Row(s)"),
-                       style="border:1px solid LightGrey; padding: 5px; margin-top:10px;")
-                 )
-          ),
-          column(width = 6,
+    
+        fluidRow( 
+          column(width = 7,
                  #h4("Bar plot", align = "Center"),
                  plotOutput("PondDiagram")
+          ),
+          
+          column(width = 7,
+                 conditionalPanel(
+                   condition = "output.tbl_populated",
+                   div(p("The table below is automatically generated using your data. If there are incorrect data, remove the row by (1) clicking", em("once"), "on each row containing incorrect values, (2) then clicking on the 'Remove Selected Rows' button:"), 
+                       actionButton("DeleteRows", "Remove Selected Row(s)"),
+                       style="border:1px solid LightGrey; padding: 5px; margin-top:10px;"),
+                   
+                   #h4("Pond Table", align = "center"),
+                   DT::dataTableOutput('PondMeasurement')
                  )
+          )
+      
         )
     )
-  )
+  
 )
   
