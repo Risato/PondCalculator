@@ -16,7 +16,7 @@ shinyUI(fluidPage(
 
     sidebarPanel(
       h4('Step 1: Enter Raw Pond Data'),
-      fileInput('FileUpload', "Upload completed table", accept = c(".xlsx")), # csv input options should be added later
+      fileInput('FileUpload', "Upload completed table", accept = c(".xlsx", ".csv")), # csv input options should be added later
       helpText("or add manually below:", align = "Center"),
       #numericInput("PondDepth", "Depth (Feet):",NULL),
       #numericInput("PondSurface", "Surface Area (Feet^2)",NULL),
@@ -61,12 +61,12 @@ shinyUI(fluidPage(
           column(width = 7,
                  conditionalPanel(
                    condition = "output.tbl_populated",
-                   div(p("The table below is automatically generated using your data. If there are incorrect data, remove the row by (1) clicking", em("once"), "on each row containing incorrect values, (2) then clicking on the 'Remove Selected Rows' button:"), 
-                       actionButton("DeleteRows", "Remove Selected Row(s)"),
-                       style="border:1px solid LightGrey; padding: 5px; margin-top:10px;"),
-                   
                    #h4("Pond Table", align = "center"),
-                   DT::dataTableOutput('PondMeasurement')
+                   DT::dataTableOutput('PondMeasurement'),
+                   div(p("The above table is automatically generated using your data. If there are incorrect data, remove the row by (1) clicking", em("once"), "on each row containing incorrect values, (2) then clicking on the 'Remove Selected Rows' button:"), 
+                       actionButton("DeleteRows", "Remove Selected Row(s)"),
+                       style="border:1px solid LightGrey; padding: 5px; margin-top:10px;")
+                   
                  )
           )
       

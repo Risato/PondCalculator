@@ -5,8 +5,8 @@ account: risato
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 417405
-bundleId: 1902738
+bundleId: 2267563
 url: https://risato.shinyapps.io/PondCalc/
-when: 1551249190.68504
+when: 1564154759.54144
 asMultiple: FALSE
 asStatic: FALSE

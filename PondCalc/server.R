@@ -38,7 +38,7 @@ add_vol <- function(depth_area_df, addzero=TRUE) {
 
 # Initiate R Shiny Server
 shinyServer(function(input, output, session) { 
-  ## ObserveEvent function that allows direct upload of spreadsheet data to populate or overwrite the contents of pond_data dataframe
+  ## [EDITREQ - add switch to import csv and excel] ObserveEvent function that allows direct upload of spreadsheet data to populate or overwrite the contents of pond_data dataframe
   observe({
     req(input$FileUpload)
     excel_df <- read_excel(input$FileUpload$datapath, 1)
