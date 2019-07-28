@@ -1,0 +1,24 @@
+div.tab-content {
+  padding: 1em;
+}
+p.instructions {
+  font-size:85%;
+  color: dimgray;
+}
+h2 {
+  font-weight: bold;
+  font-family: Georgia, serif;
+  font-size: 32px;
+  color: darkblue;
+  border-bottom: 2px solid lightgray;
+  margin-bottom: 1em;
+}  
+h4 {
+  font-weight: bold;
+  font-size: 16px;
+}
+hr.divider {
+  border: 2px solid lightgray;
+  width: 80%;
+  margin: 1em 2em;
+}
