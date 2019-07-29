@@ -173,7 +173,8 @@ shinyServer(function(input, output, session) {
     g <- ggplot(pond_data$df, aes(totVol, depth)) +
       geom_line(data=regr_xy, mapping=aes(y=pond_depth, x=est_volume), color="red", size=1) +
       geom_point(alpha=2/10, shape=21, fill="blue", size=3) +
-      scale_y_reverse() + theme_minimal() + 
+      #scale_y_reverse() + 
+      theme_minimal() + 
       ggtitle("Depth → Volume Pond Curve") + 
       theme(plot.title = element_text(hjust=0.5, size=20)) +
       labs(x="estimated volume (acre-ft)", y = "pond depth (ft)")
