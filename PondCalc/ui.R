@@ -14,11 +14,11 @@ shinyUI(fluidPage(
     
     p("This calculator estimates the volume of stock ponds based on water depth. To make this happen, a geometric model of the pond is used. The model is based on the measured surface area when the pond is filled to different levels."),
     
-    p("To use the calculator, enter your pond depth and surface area at various levels throughout the year. You may manually enter values in the text boxes below, or save them in an Excel file and upload it (use this ", a(href = '/PondCalc/PondCalculatorTemplate.xlsx', 'Blank Template'), ")."),
+    p("To use the calculator, enter your pond depth and corresponding surface area for various levels throughout the year. You may manually enter values in the text boxes below, or upload existing data from an Excel file (use this ", a(href = '/PondCalc/PondCalculatorTemplate.xlsx', 'Blank Template'), ")."),
     
-    p("Once your measurements are entered, click on the 'Calculate' button to show the total Acre-Feet of your pond. To save your values, click on the ", em("Excel"), " or ", em("CSV"), " button on the 'Pond Measurements' tab after you have entered your pond values."),
+    p("Once your measurements are entered, click on the 'Calculate' button to show the total acre-feet of your pond. To save your values, click on the ", em("Excel"), " or ", em("CSV"), " button on the 'Pond Measurements' tab after you have entered your pond values."),
     
-    p(strong("Notes: "), "This calculator provides estimates only. Estimates are more reliable for ponds < 10 acre-feet. Accuracy of the estimate is influenced by the ", strong("number"), "and ", strong("accuracy"), " of measurements of surface area and depth. Volume estimates are provided for information only. This calcluator does not save or collect any data.", style="margin:1em 3em; background-color:#ffc4c4; padding:0.5em; border:2px solid crimson;"),
+    p(strong("Notes: "), "This calculator provides estimates for ponds < 10 acre-feet only. Accuracy of the estimate is influenced by the ", strong("number"), "and ", strong("accuracy"), " of surface area and depth measurements. Volume estimates are provided for information only. This calcluator does not save or collect any data.", style="margin:1em 3em; background-color:#ffc4c4; padding:0.5em; border:2px solid crimson;"),
     
     sidebarLayout(
       sidebarPanel = sidebarPanel(
@@ -74,11 +74,14 @@ shinyUI(fluidPage(
                    #div(,, style="border:1px solid LightGrey; padding: 5px; margin-top:10px;")
           ),
           
-          tabPanel(title="Profile Model", 
-                   plotOutput("profile_plot")
-          ),
-          tabPanel(title="Pond Curve", 
+          ## Removed to reduce confusion about asymetrical ponds
+          #tabPanel(title="Profile Model", 
+          #         plotOutput("profile_plot")
+          #),
+          
+          tabPanel(title="Pond Curve",
                    plotlyOutput("depth_volume_plot")
+     
           )
         )
 
@@ -96,7 +99,9 @@ shinyUI(fluidPage(
              div(
                a(href="https://ucanr.edu/", target="_blank", title="UC Cooperative Extension", tags$img(src="ucce_logo-horizontal.svg", style="height:40px; width:326.013px;")),
                a(href="https://igis.ucanr.edu/", target="_blank", title="Shiny App support from IGIS", tags$img(src="igis_logo.svg", style="margin-left:4em; height:40px; width:39.5px;")),
-               style="margin-bottom:2em;")
+               a(href = "mailto:lcforero@ucanr.edu,rpsatomi@ucanr.edu", target = "_blank", "Contact us", style="margin-left:4em; height:40px; width:39.5px;"),
+               style="margin-bottom:2em;"
+               )
       )
     )
         
