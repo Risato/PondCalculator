@@ -138,26 +138,26 @@ shinyServer(function(input, output, session) {
     )})
 
   ## Render the profile plot
-  output$profile_plot <- renderPlot({
-    req(pond_data$df)
-
-    ## Add fields for making the trapezoids
-    trap_coords_wide <- pond_data$df %>% arrange(desc(depth)) %>% rename(d1=depth) %>% mutate(r1=sqrt(area) / 2) %>%  mutate(d2=lead(d1), r2=lead(r1)) %>% select(d1, r1, d2, r2)
-
-    ## Loop through the rows and construct the trapezoids
-    trap_coords_df <- NULL
-    for (i in 1:(nrow(trap_coords_wide)-1)) {
-      xs <- with(trap_coords_wide[i,], c(r1, r2, -r2, -r1, r1))
-      ys <- with(trap_coords_wide[i,], c(d1, d2, d2, d1, d1))
-      one_trap_df <- data.frame(id=i, x=xs,y=ys)
-      trap_coords_df <- rbind(trap_coords_df, one_trap_df)
-    }
-
-    ggplot(trap_coords_df, aes(x=x, y=y)) + geom_polygon(aes(group=id, fill=rev(id))) +
-      ggtitle("Pond Profile") + theme(plot.title = element_text(hjust=0.5, size=20)) +
-      theme(legend.position="none") + labs(x="width (ft)", y="depth (ft)")
-
-  })
+  # output$profile_plot <- renderPlot({
+  #   req(pond_data$df)
+  # 
+  #   ## Add fields for making the trapezoids
+  #   trap_coords_wide <- pond_data$df %>% arrange(desc(depth)) %>% rename(d1=depth) %>% mutate(r1=sqrt(area) / 2) %>%  mutate(d2=lead(d1), r2=lead(r1)) %>% select(d1, r1, d2, r2)
+  # 
+  #   ## Loop through the rows and construct the trapezoids
+  #   trap_coords_df <- NULL
+  #   for (i in 1:(nrow(trap_coords_wide)-1)) {
+  #     xs <- with(trap_coords_wide[i,], c(r1, r2, -r2, -r1, r1))
+  #     ys <- with(trap_coords_wide[i,], c(d1, d2, d2, d1, d1))
+  #     one_trap_df <- data.frame(id=i, x=xs,y=ys)
+  #     trap_coords_df <- rbind(trap_coords_df, one_trap_df)
+  #   }
+  # 
+  #   ggplot(trap_coords_df, aes(x=x, y=y)) + geom_polygon(aes(group=id, fill=rev(id))) +
+  #     ggtitle("Pond Profile") + theme(plot.title = element_text(hjust=0.5, size=20)) +
+  #     theme(legend.position="none") + labs(x="width (ft)", y="depth (ft)")
+  # 
+  # })
 
   ## Render the depth_volume plot
   output$depth_volume_plot <- renderPlotly({

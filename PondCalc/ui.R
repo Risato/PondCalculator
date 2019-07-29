@@ -97,11 +97,10 @@ shinyUI(fluidPage(
       column(12, 
              hr(style="border:2px solid lightgray;"),
              div(
-               a(href="https://ucanr.edu/", target="_blank", title="UC Cooperative Extension", tags$img(src="ucce_logo-horizontal.svg", style="height:40px; width:326.013px;")),
-               a(href="https://igis.ucanr.edu/", target="_blank", title="Shiny App support from IGIS", tags$img(src="igis_logo.svg", style="margin-left:4em; height:40px; width:39.5px;")),
-               a(href = "mailto:lcforero@ucanr.edu,rpsatomi@ucanr.edu", target = "_blank", "Contact us", style="margin-left:4em; height:40px; width:39.5px;"),
-               style="margin-bottom:2em;"
-               )
+               a(href="https://ucanr.edu/", target="_blank", title="UC Cooperative Extension", tags$img(src="ucce_logo-horizontal.svg", style="height:40px; width:326.013px; margin-right:4em; margin-bottom:1em;")),
+               a(href="https://igis.ucanr.edu/", target="_blank", title="Shiny App support from IGIS", tags$img(src="igis_logo.svg", style="height:40px; width:39.5px; margin-right:4em; margin-bottom:1em;")),
+               a(href = "mailto:lcforero@ucanr.edu,rpsatomi@ucanr.edu", "Contact Us"), 
+               style="margin-bottom:2em;")
       )
     )
         
