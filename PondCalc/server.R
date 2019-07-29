@@ -66,7 +66,7 @@ shinyServer(function(input, output, session) {
     projvalue<-as.numeric(predict (fit,data.frame(depth = input$CurrentDepth)))
     output$txt_current_vol <- renderText({ paste("Your pond has an estimated volume of",
                                                  (round(as.numeric(projvalue),2)), 
-                                                 " Acre-Feet")})
+                                                 " acre-feet")})
   })
   
   ## ObserveEvent function that will append additional rows to data frame when manual data 
@@ -93,6 +93,10 @@ shinyServer(function(input, output, session) {
     } else {
       pond_data$df <- add_vol(pond_data$df %>% select(depth, area) %>% bind_rows(new_depth_area_df))
     }
+    
+    ## Resets input field to demonstrate successful adding of row data
+    updateRadioButtons(session, "PondSurface", selected = NA)
+    updateRadioButtons(session, "PondDepth", selected = NA)
   })
 
   ## ObserveEvent function triggers deletion of manually selected rows defined by user
@@ -173,12 +177,12 @@ shinyServer(function(input, output, session) {
     g <- ggplot(pond_data$df, aes(totVol, depth)) +
       geom_line(data=regr_xy, mapping=aes(y=pond_depth, x=est_volume), color="red", size=1) +
       geom_point(alpha=2/10, shape=21, fill="blue", size=3) +
-      scale_y_reverse() + theme_minimal() + 
+      theme_minimal() + 
       ggtitle("Depth → Volume Pond Curve") + 
       theme(plot.title = element_text(hjust=0.5, size=20)) +
-      labs(x="estimated volume (acre-ft)", y = "pond depth (ft)")
-    
-    ggplotly(g, tooltip=c("est_volume", "pond_depth"), layerData=1)
+      labs(x="estimated volume (acre-ft)", y = "pond depth (ft)", subtitle = "Hover over the curve to see the estimated volume")
+     
+    ggplotly(g, tooltip=c("est_volume", "pond_depth"), layerData=1) %>% config(displayModeBar = FALSE) %>% layout(xaxis=list(fixedrange=TRUE)) %>% layout(yaxis=list(fixedrange=TRUE))
     
   })
   
