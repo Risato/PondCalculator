@@ -8,6 +8,7 @@ library(plotly)
 
 shinyUI(fluidPage(
     theme = "pondcalc.css",
+    tags$head(includeHTML("gtag.js")),
     titlePanel("Stock Pond Volume Calculator", windowTitle = "Pond Calculator"),
     
     h4("Introduction"),
