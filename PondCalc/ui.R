@@ -19,7 +19,7 @@ shinyUI(fluidPage(
     
     p("Once your measurements are entered, click on the 'Calculate' button to show the total acre-feet of your pond. To save your values, click on the ", em("Excel"), " or ", em("CSV"), " button on the 'Pond Measurements' tab after you have entered your pond values."),
     
-    p(strong("Notes: "), "This calculator provides estimates for ponds < 10 acre-feet only. Accuracy of the estimate is influenced by the ", strong("number"), "and ", strong("accuracy"), " of surface area and depth measurements. Volume estimates are provided for information only. This calcluator does not save or collect any data.", style="margin:1em 3em; background-color:#ffc4c4; padding:0.5em; border:2px solid crimson;"),
+    p(strong("Notes: "), "Accuracy of the estimate is influenced by the ", strong("number"), "and ", strong("accuracy"), " of surface area and depth measurements. This calcluator does not save or collect any data.", style="margin:1em 3em; background-color:#ffc4c4; padding:0.5em; border:2px solid crimson;"),
     
     sidebarLayout(
       sidebarPanel = sidebarPanel(
