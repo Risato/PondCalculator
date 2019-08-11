@@ -91,7 +91,7 @@ shinyUI(fluidPage(
 
     
     fluidRow(
-      column(12, h4("References"), p("Larry's newsletter article"), p("technical paper(s)"))
+      column(12, h4("References"), p(a("Determining Volume in a Small Pond with a Staff Gauge", href="https://ucanr.edu/sites/UCCE_Shasta_County/files/308416.pdf", target="_blank"), ", UCCE"))
     ),
     
     fluidRow(
