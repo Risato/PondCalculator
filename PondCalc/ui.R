@@ -13,18 +13,18 @@ shinyUI(fluidPage(
     
     h4("Introduction"),
     
-    p("This calculator estimates the volume of stock ponds based on water depth. To make this happen, a geometric model of the pond is used. The model is based on the measured surface area when the pond is filled to different levels."),
+    p("This calculator estimates the volume of stock ponds based on water depth. To accomplish this, a geometric model of the pond is used. The model is based on the measured surface area when the pond is filled to different levels."),
     
-    p("To use the calculator, enter your pond depth and corresponding surface area for various levels throughout the year. You may manually enter values in the text boxes below, or upload existing data from an Excel file (use this ", a(href = '/PondCalc/PondCalculatorTemplate.xlsx', 'Blank Template'), ")."),
+    p("To use the calculator, enter your pond depth and corresponding surface area for various levels throughout the year. You may manually enter values in the text boxes below or upload existing data from an Excel file using this ", a(href = '/PondCalc/PondCalculatorTemplate.xlsx', 'blank template', .noWS = 'after'), "."),
+
+    p("Once your measurements are entered, click on the \"Calculate\" button to show the total acre-feet of your pond. To save your values, click on the ", em("Excel"), " or ", em("CSV"), " button on the \"Pond Measurements\" tab after you have entered your pond values."),
     
-    p("Once your measurements are entered, click on the 'Calculate' button to show the total acre-feet of your pond. To save your values, click on the ", em("Excel"), " or ", em("CSV"), " button on the 'Pond Measurements' tab after you have entered your pond values."),
-    
-    p(strong("Notes: "), "Accuracy of the estimate is influenced by the ", strong("number"), "and ", strong("accuracy"), " of surface area and depth measurements. This calcluator does not save or collect any data.", style="margin:1em 3em; background-color:#ffc4c4; padding:0.5em; border:2px solid crimson;"),
+    p(strong("Notes: "), "Accuracy of the estimate is influenced by the ", strong("number"), "and ", strong("accuracy"), " of surface area and depth measurements. This calculator does not save or collect any data.", style="margin:1em 3em; background-color:#ffc4c4; padding:0.5em; border:2px solid crimson;"),
     
     sidebarLayout(
       sidebarPanel = sidebarPanel(
         h4("Step 1: Upload Pond Measurements"),
-        p("If you have a spreadsheet with your pond measurements, you may upload it here. If you don't have a spreadsheet, you can enter your pond measurements one-by-one in Step 2, or download a ", a(href = '/PondCalc/PondCalculatorTemplate.xlsx', 'blank template'), " and fill it in. You can also load some ", actionLink("lnk_load_sample", "sample data"), ".", class="instructions"),
+        p("If you have a spreadsheet with your pond measurements, you may upload it here. If you don't have a spreadsheet, you can enter your pond measurements one-by-one in Step 2 or download a ", a(href = '/PondCalc/PondCalculatorTemplate.xlsx', 'blank template'), " and fill it in. You can also load some ", actionLink("lnk_load_sample", "sample data", .noWS = 'after'), ".", class="instructions"),
         fileInput('FileUpload', label=NULL, accept = c(".xlsx", ".csv")), # csv input options should be added later
         hr(class="divider"),
         h4("Step 2. Edit / Add Measurements"),
@@ -91,7 +91,7 @@ shinyUI(fluidPage(
 
     
     fluidRow(
-      column(12, h4("References"), p(a("Determining Volume in a Small Pond with a Staff Gauge", href="https://ucanr.edu/sites/UCCE_Shasta_County/files/308416.pdf", target="_blank"), ", UCCE"))
+      column(12, h4("References"), p(a("Determining Volume in a Small Pond with a Staff Gauge", href="https://ucanr.edu/sites/UCCE_Shasta_County/files/308416.pdf", target="_blank", .noWS = 'after'), ", UCCE"))
     ),
     
     fluidRow(
@@ -99,14 +99,12 @@ shinyUI(fluidPage(
              hr(style="border:2px solid lightgray;"),
              div(
                a(href="https://ucanr.edu/", target="_blank", title="UC Cooperative Extension", tags$img(src="ucce_logo-horizontal.svg", style="height:40px; width:326.013px; margin-right:4em; margin-bottom:1em;")),
-               a(href="https://igis.ucanr.edu/", target="_blank", title="Shiny App support from IGIS", tags$img(src="igis_logo.svg", style="height:40px; width:39.5px; margin-right:4em; margin-bottom:1em;")),
-               a(href = "mailto:lcforero@ucanr.edu,rpsatomi@ucanr.edu", "Contact Us"), 
+               a(href="https://igis.ucanr.edu/", target="_blank", title="Another Shiny App from IGIS", tags$img(src="igis_logo.svg", style="height:40px; width:39.5px; margin-bottom:1em;"), .noWS = 'after'),
+               a(href = "mailto:lcforero@ucanr.edu,rpsatomi@ucanr.edu", "Contact Us", style="margin-left:4em;"), 
                style="margin-bottom:2em;")
       )
     )
-        
-
-  )  ## 
+  )
   
 )
   
