@@ -27,7 +27,7 @@ shinyUI(fluidPage(
         p("If you have a spreadsheet with your pond measurements, you may upload it here. If you don't have a spreadsheet, you can enter your pond measurements one-by-one in Step 2 or download a ", a(href = '/PondCalc/PondCalculatorTemplate.xlsx', 'blank template'), " and fill it in. You can also load some ", actionLink("lnk_load_sample", "sample data", .noWS = 'after'), ".", class="instructions"),
         fileInput('FileUpload', label=NULL, accept = c(".xlsx", ".csv")), # csv input options should be added later
         hr(class="divider"),
-        h4("Step 2. Edit / Add Measurements"),
+        h4("Step 2: Edit / Add Measurements"),
         p("If needed, you can edit or add your pond measurements here.", class="instructions"),
         #numericInput("PondDepth", "Depth (Feet):",NULL),
         #numericInput("PondSurface", "Surface Area (Feet^2)",NULL),
@@ -83,6 +83,11 @@ shinyUI(fluidPage(
           tabPanel(title="Pond Curve",
                    plotlyOutput("depth_volume_plot")
      
+          ),
+          
+          tabPanel(title="Volume Table",
+                   DT::dataTableOutput('volume_table')
+                   
           )
         )
 
@@ -91,7 +96,7 @@ shinyUI(fluidPage(
 
     
     fluidRow(
-      column(12, h4("References"), p(a("Determining Volume in a Small Pond with a Staff Gauge", href="https://ucanr.edu/sites/UCCE_Shasta_County/files/308416.pdf", target="_blank", .noWS = 'after'), ", UCCE"))
+      column(12, h4("Supporting Documentation"), p(a("Determining Volume in a Small Pond with a Staff Gauge and Depth-Capacity Curve", href="https://ucanr.edu/sites/UCCE_Shasta_County/files/308416.pdf", target="_blank", .noWS = 'after'), ", UCCE"))
     ),
     
     fluidRow(

@@ -126,6 +126,7 @@ shinyServer(function(input, output, session) {
     req(pond_data$df)
     DT::datatable(pond_data$df %>% dplyr::select(depth, area),
                   rownames = FALSE,
+                  colnames = c("Measured Depth (Feet)","Measured Surface Area (Feet^2)"),
                   extensions = 'Buttons',
                   options = list(
                     paging = FALSE,
@@ -170,7 +171,7 @@ shinyServer(function(input, output, session) {
     regr_mod <- lm(totVol ~ poly(depth,3), data=pond_data$df)
 
     ## Use this regression model to predict volumes across the range
-    regr_xs <- with(pond_data$df, seq(from=min(depth), to=max(depth), length.out=100))
+    regr_xs <- with(pond_data$df, seq(from=min(depth), to=max(depth), length.out=1000))
     regr_ys <- predict(regr_mod, newdata=data.frame(depth=regr_xs))
     regr_xy <- data.frame(pond_depth=regr_xs, est_volume=regr_ys)
 
@@ -185,5 +186,32 @@ shinyServer(function(input, output, session) {
     ggplotly(g, tooltip=c("est_volume", "pond_depth"), layerData=1) %>% config(displayModeBar = FALSE) %>% layout(xaxis=list(fixedrange=TRUE)) %>% layout(yaxis=list(fixedrange=TRUE))
 
   })
+  
+  output$volume_table <- DT::renderDataTable({
+    req(pond_data$df)
+    
+    regr_mod <- lm(totVol ~ poly(depth,3), data=pond_data$df)
+    
+    ## Use the regression model above to predict volume at discrete intervals
+    regr_xs <- with(pond_data$df, seq(from=1 , to=max(depth), length.out = max(depth)*2-1))
+    regr_ys <- round(predict(regr_mod, newdata=data.frame(depth=regr_xs)), digits = 1)
+    regr_xy <- data.frame(pond_depth=regr_xs, est_volume=regr_ys)
+    
+    
+    DT::datatable(regr_xy %>% dplyr::select(pond_depth, est_volume),
+                  rownames = FALSE,
+                  colnames = c("Pond Depth (Feet)","Pond Volume (Acre-Feet)"),
+                  extensions = 'Buttons',
+                  selection = 'none',
+                  options = list(
+                    paging = FALSE,
+                    searching = FALSE,
+                    dom = 'Bfrtip',
+                    buttons = list(list(extend='copy'),
+                                   list(extend='csv'),
+                                   list(extend='excel',title=NULL, filename = 'Estimated Pond Volume'),
+                                   list(extend='print')))
+    )})
+  
 
 })
