@@ -50,10 +50,7 @@ shinyServer(function(input, output, session) {
     }
     pond_data$df <- add_vol(measurements_df)
   })
-
-  ## [OLD]Function calculates total pond volume.
-  ## [OLD] output$txt_total_vol <- renderText({ paste("Your pond has a volume of", (sum(pond_data$df$vol)/43560), " Acre-Feet")})
-
+  
   ## ObserveEvent function that calculates and displays the current pond volume when triggered
   observeEvent(input$calc_current_vol, {
     ### [QAQC] Confirms required inputs are available
@@ -168,8 +165,8 @@ shinyServer(function(input, output, session) {
     ## With a 3rd order polynomial, we should alwaygs get a good fit because
     ## the 'data' were generated with a model
 
-    regr_mod <- lm(totVol ~ poly(depth,3), data=pond_data$df)
-
+    regr_mod <- lm(totVol ~ poly(depth,3,raw=T), data=pond_data$df)
+    
     ## Use this regression model to predict volumes across the range
     regr_xs <- with(pond_data$df, seq(from=min(depth), to=max(depth), length.out=1000))
     regr_ys <- predict(regr_mod, newdata=data.frame(depth=regr_xs))
@@ -184,19 +181,17 @@ shinyServer(function(input, output, session) {
       labs(x="estimated volume (acre-ft)", y = "pond depth (ft)", subtitle = "Hover over the curve to see the estimated volume")
 
     ggplotly(g, tooltip=c("est_volume", "pond_depth"), layerData=1) %>% config(displayModeBar = FALSE) %>% layout(xaxis=list(fixedrange=TRUE)) %>% layout(yaxis=list(fixedrange=TRUE))
-
   })
   
   output$volume_table <- DT::renderDataTable({
     req(pond_data$df)
     
-    regr_mod <- lm(totVol ~ poly(depth,3), data=pond_data$df)
+    regr_mod <- lm(totVol ~ poly(depth,3,raw=T), data=pond_data$df)
     
     ## Use the regression model above to predict volume at discrete intervals
     regr_xs <- with(pond_data$df, seq(from=1 , to=max(depth), length.out = max(depth)*2-1))
     regr_ys <- round(predict(regr_mod, newdata=data.frame(depth=regr_xs)), digits = 1)
     regr_xy <- data.frame(pond_depth=regr_xs, est_volume=regr_ys)
-    
     
     DT::datatable(regr_xy %>% dplyr::select(pond_depth, est_volume),
                   rownames = FALSE,
@@ -212,6 +207,12 @@ shinyServer(function(input, output, session) {
                                    list(extend='excel',title=NULL, filename = 'Estimated Pond Volume'),
                                    list(extend='print')))
     )})
-  
+
+  # Calculates and prints equation for use in excel function
+  output$txt_current_eqn <- renderPrint({
+    req(pond_data$df)
+    regr_mod <- lm(totVol ~ poly(depth,3,raw=T), data=pond_data$df)
+    polynomial((coef(regr_mod)))
+    })
 
 })

@@ -81,14 +81,13 @@ shinyUI(fluidPage(
           #),
           
           tabPanel(title="Pond Curve",
-                   plotlyOutput("depth_volume_plot")
-     
+                   plotlyOutput("depth_volume_plot"),
+                   span("Pond Curve Equation:", textOutput("txt_current_eqn"))
           ),
           
           tabPanel(title="Volume Table",
                    DT::dataTableOutput('volume_table')
-                   
-          )
+          ) 
         )
 
       )
